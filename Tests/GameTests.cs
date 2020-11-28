@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace DiskWars.Tests
@@ -7,8 +8,13 @@ namespace DiskWars.Tests
         [Fact]
         public void StartGame()
         {
-            Game game = new Game();
-            game.Start();
+            Game game = new Game
+            {
+                Log = Console.WriteLine,
+                networkRole = NetworkRole.Host
+            };
+
+            DiskWars.StartGame(ref game);
         }
     }
 }
