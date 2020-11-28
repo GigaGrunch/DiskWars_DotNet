@@ -1,12 +1,28 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 
 namespace DiskWars
 {
     public static class DiskWars
     {
-        public static void StartGame(ref Game game)
+        public static void Initialize(ref Game game)
         {
-            game.Log($"DiskWars launch parameters:\n{game}");
+            game.Log($"launching DiskWars as {game.networkRole}");
+
+            switch (game.networkRole)
+            {
+                case NetworkRole.Host:
+                {
+                    game.Log("creating TCP server");
+                    game.tcpServer = new TcpListener(IPAddress.Any, 7777);
+                } break;
+                case NetworkRole.Client:
+                {
+                    game.Log("creating TCP client");
+                    game.tcpClient = new TcpClient();
+                } break;
+            }
         }
     }
 
@@ -15,10 +31,9 @@ namespace DiskWars
         public NetworkRole networkRole;
         public Action<string> Log;
 
-        public override string ToString()
-        {
-            return $"{nameof(networkRole)} = {networkRole}";
-        }
+        public TcpListener tcpServer;
+        public TcpClient tcpClient;
+        public NetworkStream networkStream;
     }
 
     public enum NetworkRole
