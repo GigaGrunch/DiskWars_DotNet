@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DiskWars.Tests
@@ -10,17 +11,15 @@ namespace DiskWars.Tests
         {
             Game host = new Game
             {
-                Log = message => Console.WriteLine($"HOST: {message}"),
-                networkRole = NetworkRole.Host
+                Log = message => Console.WriteLine($"HOST: {message}")
             };
-            DiskWars.Initialize(ref host);
-
             Game client = new Game
             {
-                Log = message => Console.WriteLine($"CLIENT: {message}"),
-                networkRole = NetworkRole.Client
+                Log = message => Console.WriteLine($"CLIENT: {message}")
             };
-            DiskWars.Initialize(ref client);
+            
+            host.HostServer(port: 7777);
+            client.ConnectClient(host: "localhost", port: 7777);
         }
     }
 }
