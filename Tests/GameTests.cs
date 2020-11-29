@@ -9,7 +9,7 @@ namespace DiskWars.Tests
     public class GameTests
     {
         [Fact(Timeout = 1000)]
-        public async void StartHost_StartClient_Connect()
+        public async void StartHost_StartClient_Chat()
         {
             List<string> hostChats = new List<string>();
             List<string> clientChats = new List<string>();
@@ -28,6 +28,9 @@ namespace DiskWars.Tests
             Task.WaitAll(
                 host.HostServer(port: 7777),
                 client.ConnectClient(host: "localhost", port: 7777));
+
+            host.SendMessage("hi, I'm the host");
+            client.SendMessage("oh okay, I'm your client then");
 
             await WaitForChat();
 

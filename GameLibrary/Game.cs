@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiskWars
 {
-    public struct Game
+    public class Game
     {
         public delegate void LogCallback(string message);
         public LogCallback Log;
@@ -31,7 +31,6 @@ namespace DiskWars
             networkReader = new StreamReader(networkStream);
 
             HandleIncomingMessages();
-            SendMessage("hello, I am the host!");
         }
 
         public async Task ConnectClient(string host, int port)
@@ -47,7 +46,6 @@ namespace DiskWars
             networkReader = new StreamReader(networkStream);
 
             HandleIncomingMessages();
-            SendMessage("hello, I am a client!");
         }
 
         public void SendMessage(string message)
