@@ -26,8 +26,8 @@ namespace DiskWars.Tests
             };
 
             Task.WaitAll(
-                host.HostServer(port: 7777),
-                client.ConnectClient(host: "localhost", port: 7777));
+                host.HostServer(port: 6666),
+                client.ConnectClient(host: "localhost", port: 6666));
 
             host.SendMessage("hi, I'm the host");
             client.SendMessage("oh okay, I'm your client then");
