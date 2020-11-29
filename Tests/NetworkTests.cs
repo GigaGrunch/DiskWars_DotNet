@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DiskWars.Tests
 {
-    public class GameTests
+    public class NetworkTests
     {
         [Fact(Timeout = 1000)]
         public async void StartHost_StartClient_Chat()
@@ -14,12 +14,12 @@ namespace DiskWars.Tests
             List<string> hostChats = new List<string>();
             List<string> clientChats = new List<string>();
 
-            Game host = new Game
+            Network host = new Network
             {
                 Log = message => Console.WriteLine($"HOST: {message}"),
                 ChatReceived = message => hostChats.Add(message)
             };
-            Game client = new Game
+            Network client = new Network
             {
                 Log = message => Console.WriteLine($"CLIENT: {message}"),
                 ChatReceived = message => clientChats.Add(message)

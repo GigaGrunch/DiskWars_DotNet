@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiskWars
 {
-    public class Game
+    public class Network
     {
         public delegate void LogCallback(string message);
         public LogCallback Log;
