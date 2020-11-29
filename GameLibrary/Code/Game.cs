@@ -45,7 +45,7 @@ namespace DiskWars
 
         public void PlaceDisk()
         {
-
+            
         }
     }
 }

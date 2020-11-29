@@ -29,8 +29,13 @@ namespace DiskWars.Tests
                 host.HostServer(port: 6666),
                 client.ConnectClient(host: "localhost", port: 6666));
 
-            host.SendMessage("hi, I'm the host");
-            client.SendMessage("oh okay, I'm your client then");
+            var chatMessage = new Network.Message.Chat
+            {
+                message = "hello!"
+            };
+
+            host.SendMessage(chatMessage);
+            client.SendMessage(chatMessage);
 
             await WaitForChat();
 
