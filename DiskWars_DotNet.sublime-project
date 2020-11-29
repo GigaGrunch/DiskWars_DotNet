@@ -1,0 +1,16 @@
+{
+    "folders":
+    [
+        {
+            "path": "."
+        }
+    ],
+    "build_systems":
+    [
+        {
+            "name": "Run Tests",
+            "working_dir": "$project_path/Tests",
+            "shell_cmd": "dotnet test"
+        }
+    ]
+}
