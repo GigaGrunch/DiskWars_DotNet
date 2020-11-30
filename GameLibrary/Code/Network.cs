@@ -14,7 +14,6 @@ namespace DiskWars
         public delegate void ChatCallback(string message);
         public ChatCallback ChatReceived;
 
-        public NetworkStream networkStream;
         public StreamWriter networkWriter;
         public StreamReader networkReader;
 
@@ -27,7 +26,7 @@ namespace DiskWars
             TcpClient client = await listener.AcceptTcpClientAsync();
             Log("a client connected");
 
-            networkStream = client.GetStream();
+            NetworkStream networkStream = client.GetStream();
             networkWriter = new StreamWriter(networkStream);
             networkReader = new StreamReader(networkStream);
 
@@ -42,7 +41,7 @@ namespace DiskWars
             await tcpClient.ConnectAsync(host: host, port: port);
             Log("connected to server");
 
-            networkStream = tcpClient.GetStream();
+            NetworkStream networkStream = tcpClient.GetStream();
             networkWriter = new StreamWriter(networkStream);
             networkReader = new StreamReader(networkStream);
 
