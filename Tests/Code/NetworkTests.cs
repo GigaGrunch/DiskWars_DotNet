@@ -30,10 +30,10 @@ namespace DiskWars.Tests
                 client.ConnectClient(host: "localhost", port: 6666));
 
 
-            var message = new Network.Message
+            var message = new NetworkMessage
             {
-                type = Network.Message.Type.Chat,
-                chat = new Network.Message.Chat
+                type = NetworkMessage.Type.Chat,
+                chat = new NetworkMessage.Chat
                 {
                     message = "hello!"
                 }
