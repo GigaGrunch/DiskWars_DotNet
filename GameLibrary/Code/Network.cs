@@ -74,7 +74,18 @@ namespace DiskWars
 
             while (await ReadNext(networkReader))
             {
-                ChatReceived("TODO!"); // TODO!
+                switch (message.type)
+                {
+                    case NetworkMessage.Type.Chat:
+                    {
+                        Log("received chat: " + message.chat.message);
+                        ChatReceived(message.chat.message);
+                    } break;
+                    case NetworkMessage.Type.DiskPlacement:
+                    {
+                        Log("place disk (TODO)"); // TODO
+                    } break;
+                }
             }
         }
     }

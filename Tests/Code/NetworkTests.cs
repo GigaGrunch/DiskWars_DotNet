@@ -33,13 +33,12 @@ namespace DiskWars.Tests
             var message = new NetworkMessage
             {
                 type = NetworkMessage.Type.Chat,
-                chat = new NetworkMessage.Chat
-                {
-                    message = "hello!"
-                }
             };
 
+            message.chat.message = "hello, I am your host!";
             host.SendMessage(message);
+
+            message.chat.message = "hi, I want to be your friend :)";
             client.SendMessage(message);
 
             await WaitForChat();
