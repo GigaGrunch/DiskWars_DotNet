@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DiskWars
@@ -16,6 +17,8 @@ namespace DiskWars
         public ChatCallback ChatReceived;
 
         public NetworkStream networkStream;
+        public StreamWriter networkWriter;
+        public StreamReader networkReader;
 
         public async Task HostServer(int port)
         {
@@ -27,6 +30,8 @@ namespace DiskWars
             Log("a client connected");
 
             networkStream = client.GetStream();
+            networkWriter = new StreamWriter(networkStream);
+            networkReader = new StreamReader(networkStream);
 
             HandleIncomingMessages();
         }
@@ -40,51 +45,41 @@ namespace DiskWars
             Log("connected to server");
 
             networkStream = tcpClient.GetStream();
+            networkWriter = new StreamWriter(networkStream);
+            networkReader = new StreamReader(networkStream);
 
             HandleIncomingMessages();
         }
 
-        public void SendMessage(Message.Payload payload)
+        public void SendMessage(Message message)
         {
-            Message message = new Message();
-
-            switch (payload)
-            {
-                case Message.Chat chat:
-                {
-                    message.type = Message.Type.Chat;
-                    message.payload = Message.Serialize(chat, 8192);
-                } break;
-                case Message.DiskPlacement diskPlacement:
-                {
-                    message.type = Message.Type.DiskPlacement;
-                    message.payload = Message.Serialize(diskPlacement, 8192);
-                } break;
-            }
-
-            byte[] serialized = Message.Serialize(message);
-            networkStream.WriteAsync(serialized, 0, serialized.Length);
+            string serialized = message.Serialize();
+            networkWriter.WriteLine(serialized);
+            networkWriter.Flush();
         }
 
         public async void HandleIncomingMessages()
         {
             Network.Message message = default;
-            byte[] buffer = new byte[Marshal.SizeOf(message)];
 
-            async Task<bool> ReadNext(NetworkStream stream)
+            async Task<bool> ReadNext(StreamReader reader)
             {
-                int readBytes = await stream.ReadAsync(buffer, 0, buffer.Length);
-                message = Message.Deserialize(buffer);
-                return readBytes == buffer.Length;
+                string serialized = await reader.ReadLineAsync();
+                if (serialized == null)
+                {
+                    return false;
+                }
+
+                message = Message.Deserialize(serialized);
+                return true;
             }
 
-            while (await ReadNext(networkStream))
+            while (await ReadNext(networkReader))
             {
                 ChatReceived("TODO!"); // TODO!
             }
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0)]
         public struct Message
         {
             public enum Type
@@ -95,44 +90,111 @@ namespace DiskWars
 
             public Type type;
 
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst=8192)]
-            public byte[] payload;
+            public Chat chat;
+            public DiskPlacement diskPlacement;
 
-            public interface Payload { }
-
-            [StructLayout(LayoutKind.Sequential, Pack = 0)]
-            public struct Chat : Payload
+            public string Serialize()
             {
-                [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1024)]
+                string typeString = null;
+                string payload = null;
+
+                switch (type)
+                {
+                    case Type.Chat:
+                    {
+                        typeString = nameof(chat);
+                        payload = chat.Serialize();
+                    } break;
+                    case Type.DiskPlacement:
+                    {
+                        typeString = nameof(diskPlacement);
+                        payload = diskPlacement.Serialize();
+                    } break;
+                }
+
+                return
+                    "{" +
+                        $"\"{nameof(type)}\":\"{typeString}\"," +
+                        $"\"{typeString}\":{payload}" +
+                    "}";
+            }
+
+            public static Message Deserialize(string json)
+            {
+                string payloadKey = "payload";
+                string pattern =
+                    "{.*" +
+                        $"\"{nameof(type)}\".*:.*\"(?<{nameof(type)}>.*)\".*,.*" +
+                        $"\".*\".*:.*(?<{payloadKey}>{{.*}})" +
+                    ".*}";
+
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(json);
+
+                string typeString = match.Groups[nameof(type)].Value;
+                string payload = match.Groups[payloadKey].Value;
+
+                Message message = new Message();
+
+                switch (typeString)
+                {
+                    case nameof(chat):
+                    {
+                        message.type = Type.Chat;
+                        message.chat = Chat.Deserialize(payload);
+                    } break;
+                    case nameof(diskPlacement):
+                    {
+                        message.type = Type.DiskPlacement;
+                        message.diskPlacement = DiskPlacement.Deserialize(payload);
+                    } break;
+                }
+
+                return message;
+            }
+
+            public struct Chat
+            {
                 public string message;
+
+                public string Serialize()
+                {
+                    return
+                        "{" +
+                            $"\"{nameof(message)}\":\"{message}\"" +
+                        "}";
+                }
+
+                public static Chat Deserialize(string json)
+                {
+                    string pattern =
+                        "{.*" +
+                            $"\"{nameof(message)}\".*:.*\"(?<{nameof(message)}>.*)\"" +
+                        ".*}";
+
+                    Regex regex = new Regex(pattern);
+                    Match match = regex.Match(json);
+
+                    string messageString = match.Groups[nameof(message)].Value;
+
+                    return new Chat
+                    {
+                        message = messageString
+                    };
+                }
             }
 
-            [StructLayout(LayoutKind.Sequential, Pack = 0)]
-            public struct DiskPlacement : Payload
+            public struct DiskPlacement
             {
+                public string Serialize()
+                {
+                    return "{}";
+                }
 
-            }
-
-            public static byte[] Serialize<T>(T structure)
-            {
-                return Serialize(structure, Marshal.SizeOf(structure));
-            }
-
-            public static byte[] Serialize<T>(T structure, int size)
-            {
-                byte[] bytes = new byte[size];
-
-                IntPtr pointer = Marshal.AllocHGlobal(size);
-                Marshal.StructureToPtr(structure, pointer, false);
-                Marshal.Copy(pointer, bytes, 0, size);
-                Marshal.FreeHGlobal(pointer);
-
-                return bytes;
-            }
-
-            public static Message Deserialize(byte[] serialized)
-            {
-                return new Message(); // TODO!
+                public static DiskPlacement Deserialize(string json)
+                {
+                    return new DiskPlacement();
+                }
             }
         }
     }
