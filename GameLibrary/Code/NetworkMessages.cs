@@ -6,13 +6,11 @@ namespace DiskWars
     {
         public enum Type
         {
-            Chat,
             DiskPlacement
         }
 
         public Type type;
 
-        public Chat chat;
         public DiskPlacement diskPlacement;
 
         public string Serialize()
@@ -22,11 +20,6 @@ namespace DiskWars
 
             switch (type)
             {
-                case Type.Chat:
-                {
-                    typeString = nameof(chat);
-                    payload = chat.Serialize();
-                } break;
                 case Type.DiskPlacement:
                 {
                     typeString = nameof(diskPlacement);
@@ -60,11 +53,6 @@ namespace DiskWars
 
             switch (typeString)
             {
-                case nameof(chat):
-                {
-                    message.type = Type.Chat;
-                    message.chat = Chat.Deserialize(payload);
-                } break;
                 case nameof(diskPlacement):
                 {
                     message.type = Type.DiskPlacement;
@@ -73,37 +61,6 @@ namespace DiskWars
             }
 
             return message;
-        }
-
-        public struct Chat
-        {
-            public string message;
-
-            public string Serialize()
-            {
-                return
-                    "{" +
-                        $"\"{nameof(message)}\":\"{message}\"" +
-                    "}";
-            }
-
-            public static Chat Deserialize(string json)
-            {
-                string pattern =
-                    "{.*" +
-                        $"\"{nameof(message)}\".*:.*\"(?<{nameof(message)}>.*)\"" +
-                    ".*}";
-
-                Regex regex = new Regex(pattern);
-                Match match = regex.Match(json);
-
-                string messageString = match.Groups[nameof(message)].Value;
-
-                return new Chat
-                {
-                    message = messageString
-                };
-            }
         }
 
         public struct DiskPlacement

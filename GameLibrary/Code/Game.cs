@@ -16,19 +16,12 @@ namespace DiskWars
         public delegate void LogCallback(string message);
         public LogCallback Log;
 
-        public delegate void ChatCallback(string message);
-        public ChatCallback ChatReceived;
-
-        public delegate void DiskPlacementCall();
-        public DiskPlacementCall DiskPlaced;
-
         public async Task Start()
         {
             network = new Network
             {
                 Log = message => Log(message),
-                ChatReceived = message => ChatReceived(message),
-                DiskPlaced = () => DiskPlaced()
+                MessageReceived = HandleNetworkMessage
             };
 
             switch (networkRole)
@@ -42,6 +35,11 @@ namespace DiskWars
                     await network.ConnectClient(host: "localhost", port: 7777);
                 } break;
             }
+        }
+
+        public void HandleNetworkMessage(NetworkMessage message)
+        {
+
         }
 
         public void PlaceDisk()

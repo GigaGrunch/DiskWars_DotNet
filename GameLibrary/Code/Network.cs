@@ -8,14 +8,10 @@ namespace DiskWars
 {
     public class Network
     {
-        public delegate void LogCallback(string message);
-        public LogCallback Log;
+        public Game.LogCallback Log;
 
-        public delegate void ChatCallback(string message);
-        public ChatCallback ChatReceived;
-
-        public delegate void DiskPlacementCallback();
-        public DiskPlacementCallback DiskPlaced;
+        public delegate void NetworkMessageCallback(NetworkMessage message);
+        public NetworkMessageCallback MessageReceived;
 
         public StreamWriter networkWriter;
         public StreamReader networkReader;
@@ -76,19 +72,8 @@ namespace DiskWars
 
             while (await ReadNext(networkReader))
             {
-                switch (message.type)
-                {
-                    case NetworkMessage.Type.Chat:
-                    {
-                        Log("received chat: " + message.chat.message);
-                        ChatReceived(message.chat.message);
-                    } break;
-                    case NetworkMessage.Type.DiskPlacement:
-                    {
-                        Log("disk placement message received");
-                        DiskPlaced();
-                    } break;
-                }
+                Log($"received a {message.type} message");
+                MessageReceived(message);
             }
         }
     }

@@ -15,15 +15,11 @@ namespace DiskWars.Tests
             {
                 networkRole = NetworkRole.Host,
                 Log = message => Console.WriteLine($"HOST: {message}"),
-                ChatReceived = message => Console.WriteLine($"(chat) CLIENT: {message}"),
-                DiskPlaced = () => { }
             };
             Game client = new Game
             {
                 networkRole = NetworkRole.Client,
                 Log = message => Console.WriteLine($"CLIENT: {message}"),
-                ChatReceived = message => Console.WriteLine($"(chat) HOST: {message}"),
-                DiskPlaced = () => diskSpawnedAtClient = true
             };
 
             Task.WaitAll(
