@@ -8,7 +8,7 @@ namespace DiskWars.Tests
 {
     public class NetworkTests
     {
-        [Fact(Timeout = 5000)]
+        [Fact(Timeout = 1000)]
         public void StartHost_StartClient_Connect()
         {
             Log("test start");

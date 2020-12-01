@@ -1,13 +1,14 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+// [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace DiskWars.Tests
 {
     public class GameTests
     {
-        [Fact(Timeout = 5000)]
-        public async void StartMultiplayer_HostPlacesDisk()
+        [Fact(Timeout = 1000)]
+        public void StartMultiplayer_HostPlacesDisk()
         {
             Log("test start");
 
@@ -30,22 +31,17 @@ namespace DiskWars.Tests
                 ID = 1
             });
 
-            await WaitForSpawn();
+            while (true)
+            {
+                if (client.disks.Length > 0)
+                {
+                    break;
+                }
+
+                Task.Delay(10);
+            }
 
             Log("test finish");
-
-            async Task WaitForSpawn()
-            {
-                while (true)
-                {
-                    if (client.disks.Length > 0)
-                    {
-                        return;
-                    }
-
-                    await Task.Delay(10);
-                }
-            }
 
             void Log(string message)
             {
@@ -53,8 +49,8 @@ namespace DiskWars.Tests
             }
         }
 
-        [Fact(Timeout = 5000)]
-        public async void StartMultiplayer_ClientPlacesDisk()
+        [Fact(Timeout = 1000)]
+        public void StartMultiplayer_ClientPlacesDisk()
         {
             Log("test start");
 
@@ -77,22 +73,17 @@ namespace DiskWars.Tests
                 ID = 1
             });
 
-            await WaitForSpawn();
+            while (true)
+            {
+                if (client.disks.Length > 0 && host.disks.Length > 0)
+                {
+                    break;
+                }
+
+                Task.Delay(10);
+            }
 
             Log("test finish");
-
-            async Task WaitForSpawn()
-            {
-                while (true)
-                {
-                    if (client.disks.Length > 0 && host.disks.Length > 0)
-                    {
-                        return;
-                    }
-
-                    await Task.Delay(10);
-                }
-            }
 
             void Log(string message)
             {
