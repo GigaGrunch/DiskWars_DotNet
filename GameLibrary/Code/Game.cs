@@ -27,7 +27,8 @@ namespace DiskWars
             network = new Network
             {
                 Log = message => Log(message),
-                ChatReceived = message => ChatReceived(message)
+                ChatReceived = message => ChatReceived(message),
+                DiskPlaced = () => DiskPlaced()
             };
 
             switch (networkRole)
@@ -45,7 +46,18 @@ namespace DiskWars
 
         public void PlaceDisk()
         {
-            
+            if (networkRole == NetworkRole.Host)
+            {
+                // TODO: place disk for real
+            }
+
+            NetworkMessage message = new NetworkMessage
+            {
+                type = NetworkMessage.Type.DiskPlacement,
+                diskPlacement = new NetworkMessage.DiskPlacement()
+            };
+
+            network.SendMessage(message);
         }
     }
 }

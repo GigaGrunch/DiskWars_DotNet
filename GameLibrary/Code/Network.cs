@@ -14,6 +14,9 @@ namespace DiskWars
         public delegate void ChatCallback(string message);
         public ChatCallback ChatReceived;
 
+        public delegate void DiskPlacementCallback();
+        public DiskPlacementCallback DiskPlaced;
+
         public StreamWriter networkWriter;
         public StreamReader networkReader;
 
@@ -82,7 +85,8 @@ namespace DiskWars
                     } break;
                     case NetworkMessage.Type.DiskPlacement:
                     {
-                        Log("place disk (TODO)"); // TODO
+                        Log("disk placement message received");
+                        DiskPlaced();
                     } break;
                 }
             }
