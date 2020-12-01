@@ -8,21 +8,30 @@ namespace DiskWars.Tests
 {
     public class NetworkTests
     {
-        [Fact(Timeout = 1000)]
+        [Fact(Timeout = 5000)]
         public void StartHost_StartClient_Connect()
         {
+            Log("test start");
+
             Network host = new Network
             {
-                Log = message => Console.WriteLine($"HOST: {message}"),
+                Log = message => Log($"HOST: {message}"),
             };
             Network client = new Network
             {
-                Log = message => Console.WriteLine($"CLIENT: {message}"),
+                Log = message => Log($"CLIENT: {message}"),
             };
 
             Task.WaitAll(
-                host.HostServer(port: 6666),
-                client.ConnectClient(host: "localhost", port: 6666));
+                host.HostServer(port: 7000),
+                client.ConnectClient(host: "localhost", port: 7000));
+
+            Log("test finish");
+
+            void Log(string message)
+            {
+                Console.WriteLine($"{nameof(StartHost_StartClient_Connect)} | {message}");
+            }
         }
     }
 }

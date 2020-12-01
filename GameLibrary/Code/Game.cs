@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace DiskWars
@@ -18,27 +19,32 @@ namespace DiskWars
 
         public Disk[] disks;
 
-        public async Task Start()
+        public async Task StartHost(int port)
         {
             disks = new Disk[4096];
 
+            networkRole = NetworkRole.Host;
             network = new Network
             {
                 Log = message => Log(message),
                 MessageReceived = HandleNetworkMessage
             };
 
-            switch (networkRole)
+            await network.HostServer(port: port);
+        }
+
+        public async Task StartClient(string host, int port)
+        {
+            disks = new Disk[4096];
+
+            networkRole = NetworkRole.Client;
+            network = new Network
             {
-                case NetworkRole.Host:
-                {
-                    await network.HostServer(port: 7777);
-                } break;
-                case NetworkRole.Client:
-                {
-                    await network.ConnectClient(host: "localhost", port: 7777);
-                } break;
-            }
+                Log = message => Log(message),
+                MessageReceived = HandleNetworkMessage
+            };
+
+            await network.ConnectClient(host: host, port: port);
         }
 
         public void HandleNetworkMessage(NetworkMessage message)
