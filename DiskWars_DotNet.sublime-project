@@ -8,6 +8,11 @@
     "build_systems":
     [
         {
+            "name": "Build",
+            "working_dir": "$project_path/GameLibrary",
+            "shell_cmd": "dotnet build --no-incremental"
+        },
+        {
             "name": "Run Tests",
             "working_dir": "$project_path/Tests",
             "shell_cmd": "dotnet test"
