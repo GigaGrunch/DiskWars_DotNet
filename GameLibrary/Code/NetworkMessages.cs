@@ -38,10 +38,10 @@ namespace DiskWars
         {
             string payloadKey = "payload";
             string pattern =
-                "{.*" +
-                    $"\"{nameof(type)}\".*:.*\"(?<{nameof(type)}>.*)\".*,.*" +
-                    $"\".*\".*:.*(?<{payloadKey}>{{.*}})" +
-                ".*}";
+                "{" +
+                    $"\"{nameof(type)}\":\"(?<{nameof(type)}>.*)\"," +
+                    $"\".*\":(?<{payloadKey}>{{.*}})" +
+                "}";
 
             Regex regex = new Regex(pattern);
             Match match = regex.Match(json);
@@ -65,14 +65,33 @@ namespace DiskWars
 
         public struct DiskPlacement
         {
+            public int diskID;
+
             public string Serialize()
             {
-                return "{}";
+                return
+                    "{" +
+                        $"\"{nameof(diskID)}\":{diskID}" +
+                    "}";
             }
 
             public static DiskPlacement Deserialize(string json)
             {
-                return new DiskPlacement();
+                string pattern =
+                    "{" +
+                        $"\"{nameof(diskID)}\":(?<{nameof(diskID)}>\\d*)" +
+                    "}";
+
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(json);
+
+                string idString = match.Groups[nameof(diskID)].Value;
+                int ID = int.Parse(idString);
+
+                return new DiskPlacement
+                {
+                    diskID = ID
+                };
             }
         }
     }
